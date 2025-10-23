@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuptial Flight Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                    Nuptial Flight Calculator
+                </h1>
+                <p class="text-gray-600">
+                    Enter current weather conditions to predict ant nuptial flight likelihood
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        📍 Province (South Africa)
+                    </label>
+                    <select id="province" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="">Select your province...</option>
+                        <option value="Eastern Cape">Eastern Cape</option>
+                        <option value="Free State">Free State</option>
+                        <option value="Gauteng">Gauteng</option>
+                        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                        <option value="Limpopo">Limpopo</option>
+                        <option value="Mpumalanga">Mpumalanga</option>
+                        <option value="Northern Cape">Northern Cape</option>
+                        <option value="North West">North West</option>
+                        <option value="Western Cape">Western Cape</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        ☁️ Biome
+                    </label>
+                    <select id="biome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="">Select closest biome...</option>
+                        <option value="grassland">Grassland</option>
+                        <option value="savanna">Savanna</option>
+                        <option value="fynbos">Fynbos</option>
+                        <option value="forest">Forest</option>
+                        <option value="nama-karoo">Nama-Karoo</option>
+                        <option value="succulent-karoo">Succulent Karoo</option>
+                        <option value="thicket">Albany Thicket</option>
+                        <option value="desert">Desert</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        🌡️ Temperature (°C)
+                    </label>
+                    <input type="number" id="temperature" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="e.g., 26">
+                </div>
+
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        💧 Humidity (%)
+                    </label>
+                    <input type="number" id="humidity" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="e.g., 65">
+                </div>
+
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        💨 Wind Speed (mph)
+                    </label>
+                    <input type="number" id="windSpeed" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="e.g., 5">
+                </div>
+
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        ☁️ Cloud Cover
+                    </label>
+                    <select id="cloudCover" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="clear">Clear</option>
+                        <option value="partly">Partly Cloudy</option>
+                        <option value="overcast">Overcast</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        📅 Time of Day
+                    </label>
+                    <select id="timeOfDay" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="morning">Morning</option>
+                        <option value="afternoon" selected>Afternoon</option>
+                        <option value="evening">Evening</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" id="recentRain" class="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500">
+                    <label for="recentRain" class="ml-2 text-sm text-gray-700">
+                        Rain in the last 24 hours
+                    </label>
+                </div>
+
+                <button onclick="calculateProbability()" class="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors">
+                    Calculate Flight Probability
+                </button>
+            </div>
+
+            <div id="results" class="hidden mt-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border-2 border-orange-200">
+            </div>
+        </div>
+
+        <div class="mt-6 text-center text-sm text-gray-600">
+            <p>Optimal conditions: 24-29°C, 60-80% humidity, wind &lt;10mph, after rain</p>
+        </div>
+    </div>
+
+    <script>
+        const biomeNames = {
+            grassland: 'Grassland',
+            savanna: 'Savanna',
+            fynbos: 'Fynbos',
+            forest: 'Forest',
+            'nama-karoo': 'Nama-Karoo',
+            'succulent-karoo': 'Succulent Karoo',
+            thicket: 'Albany Thicket',
+            desert: 'Desert'
+        };
+
+        const speciesByBiome = {
+            grassland: [
+                {
+                    name: 'Anoplolepis custodiens (Common Pugnacious Ant)',
+                    location: 'Open grasslands and disturbed areas',
+                    lookFor: 'Look for mounds in dry grassy patches, often near paths or clearings'
+                },
+                {
+                    name: 'Tetramorium quadrispinosum',
+                    location: 'Grassland soil nests',
+                    lookFor: 'Check for small crater-like nest entrances in short grass areas'
+                },
+                {
+                    name: 'Camponotus niveosetosus',
+                    location: 'Dead grass stems and hollow plant material',
+                    lookFor: 'Watch around dead grass clumps and hollow stems in open areas'
+                },
+                {
+                    name: 'Pheidole species',
+                    location: 'Under rocks and in soil',
+                    lookFor: 'Look under flat rocks and in bare soil patches'
+                }
+            ],
+            savanna: [
+                {
+                    name: 'Camponotus maculatus (Sugar Ant)',
+                    location: 'Tree trunks and branches',
+                    lookFor: 'Look at tree canopies, especially acacia trees, and watch tree trunks at dusk'
+                },
+                {
+                    name: 'Anoplolepis steingroeveri',
+                    location: 'Ground nests in sandy soil',
+                    lookFor: 'Check sandy areas with sparse vegetation for small mounds'
+                },
+                {
+                    name: 'Crematogaster species',
+                    location: 'Tree hollows and branches',
+                    lookFor: 'Watch tree canopies and dead branches, especially on acacia trees'
+                },
+                {
+                    name: 'Messor capensis (Harvester Ant)',
+                    location: 'Open ground with cleared areas',
+                    lookFor: 'Look for large cleared circles around nest entrances in bare ground'
+                },
+                {
+                    name: 'Tetramorium species',
+                    location: 'Soil nests in open areas',
+                    lookFor: 'Check bare ground and under stones in open savanna'
+                }
+            ],
+            fynbos: [
+                {
+                    name: 'Anoplolepis custodiens',
+                    location: 'Sandy soils and disturbed fynbos',
+                    lookFor: 'Look in sandy patches and along pathways through fynbos'
+                },
+                {
+                    name: 'Camponotus species',
+                    location: 'Dead fynbos stems and protea plants',
+                    lookFor: 'Check dead protea stems and hollow branches of fynbos shrubs'
+                },
+                {
+                    name: 'Tetramorium species',
+                    location: 'Under stones in fynbos',
+                    lookFor: 'Look under flat rocks in open sandy areas'
+                },
+                {
+                    name: 'Monomorium species',
+                    location: 'Soil nests in sandy fynbos',
+                    lookFor: 'Check sandy soil areas with sparse vegetation'
+                }
+            ],
+            forest: [
+                {
+                    name: 'Camponotus species',
+                    location: 'Tree canopies and dead wood',
+                    lookFor: 'Watch tree canopies and check rotting logs on the forest floor'
+                },
+                {
+                    name: 'Tetramorium species',
+                    location: 'Leaf litter and under logs',
+                    lookFor: 'Look in leaf litter and under rotting wood on the ground'
+                },
+                {
+                    name: 'Pheidole megacephala',
+                    location: 'Forest edges and disturbed areas',
+                    lookFor: 'Check forest edges, clearings, and around fallen branches'
+                },
+                {
+                    name: 'Crematogaster species',
+                    location: 'Tree hollows and branches',
+                    lookFor: 'Watch mid to upper tree canopy, especially hollow branches'
+                }
+            ],
+            'nama-karoo': [
+                {
+                    name: 'Messor capensis (Harvester Ant)',
+                    location: 'Open semi-desert ground',
+                    lookFor: 'Look for cleared circles in bare ground, often near grass tufts'
+                },
+                {
+                    name: 'Camponotus species',
+                    location: 'Under rocks and in karoo shrubs',
+                    lookFor: 'Check under flat stones and in dead karoo bush stems'
+                },
+                {
+                    name: 'Monomorium species',
+                    location: 'Sandy and gravelly soil',
+                    lookFor: 'Look in sandy patches between shrubs and under stones'
+                },
+                {
+                    name: 'Tetramorium species',
+                    location: 'Stony ground and under rocks',
+                    lookFor: 'Check under stones in open areas and gravelly patches'
+                }
+            ],
+            'succulent-karoo': [
+                {
+                    name: 'Messor capensis',
+                    location: 'Open ground near succulents',
+                    lookFor: 'Look for cleared nest areas in sandy soil near succulent plants'
+                },
+                {
+                    name: 'Anoplolepis steingroeveri',
+                    location: 'Sandy soil between vegetation',
+                    lookFor: 'Check sandy areas with sparse vegetation coverage'
+                },
+                {
+                    name: 'Camponotus species',
+                    location: 'Under stones and in dead plant stems',
+                    lookFor: 'Look under flat rocks and in hollow succulent stems'
+                },
+                {
+                    name: 'Monomorium species',
+                    location: 'Sandy soil nests',
+                    lookFor: 'Check sandy patches between succulent plants'
+                }
+            ],
+            thicket: [
+                {
+                    name: 'Anoplolepis custodiens',
+                    location: 'Clearings in thicket',
+                    lookFor: 'Look in open patches and along paths through dense vegetation'
+                },
+                {
+                    name: 'Camponotus maculatus',
+                    location: 'Trees and shrubs in thicket',
+                    lookFor: 'Watch tree and shrub canopies, especially at dusk'
+                },
+                {
+                    name: 'Pheidole species',
+                    location: 'Under debris and stones',
+                    lookFor: 'Check under leaf litter, stones, and fallen branches'
+                },
+                {
+                    name: 'Crematogaster species',
+                    location: 'Tree branches and hollow stems',
+                    lookFor: 'Look in tree canopies and dead branches of thicket plants'
+                }
+            ],
+            desert: [
+                {
+                    name: 'Camponotus species',
+                    location: 'Under rocks and in dead vegetation',
+                    lookFor: 'Check under stones and in hollow desert plant stems'
+                },
+                {
+                    name: 'Messor capensis',
+                    location: 'Open desert floor',
+                    lookFor: 'Look for cleared circular areas around nest entrances'
+                },
+                {
+                    name: 'Monomorium species',
+                    location: 'Sandy desert soil',
+                    lookFor: 'Check sandy areas, often near vegetation clumps'
+                },
+                {
+                    name: 'Cataglyphis species',
+                    location: 'Open desert ground',
+                    lookFor: 'Look in very hot, open sandy areas during warmest part of day'
+                }
+            ]
+        };
+
+        function calculateProbability() {
+            const temp = parseFloat(document.getElementById('temperature').value);
+            const humidity = parseFloat(document.getElementById('humidity').value);
+            const wind = parseFloat(document.getElementById('windSpeed').value);
+            const recentRain = document.getElementById('recentRain').checked;
+            const timeOfDay = document.getElementById('timeOfDay').value;
+            const cloudCover = document.getElementById('cloudCover').value;
+            const biome = document.getElementById('biome').value;
+
+            let score = 0;
+            let factors = [];
+
+            if (temp >= 24 && temp <= 29) {
+                score += 30;
+                factors.push({ text: 'Temperature is ideal', positive: true });
+            } else if (temp >= 21 && temp < 24) {
+                score += 20;
+                factors.push({ text: 'Temperature is acceptable', positive: true });
+            } else if (temp > 29 && temp <= 35) {
+                score += 15;
+                factors.push({ text: 'Temperature is warm but acceptable', positive: true });
+            } else {
+                factors.push({ text: 'Temperature is not optimal', positive: false });
+            }
+
+            if (humidity >= 60 && humidity <= 80) {
+                score += 25;
+                factors.push({ text: 'Humidity is ideal', positive: true });
+            } else if (humidity >= 50 && humidity < 60) {
+                score += 15;
+                factors.push({ text: 'Humidity is acceptable', positive: true });
+            } else if (humidity > 80 && humidity <= 90) {
+                score += 10;
+                factors.push({ text: 'Humidity is high but acceptable', positive: true });
+            } else {
+                factors.push({ text: 'Humidity is not optimal', positive: false });
+            }
+
+            if (wind < 5) {
+                score += 20;
+                factors.push({ text: 'Wind conditions are perfect', positive: true });
+            } else if (wind >= 5 && wind < 10) {
+                score += 15;
+                factors.push({ text: 'Wind is calm enough', positive: true });
+            } else if (wind >= 10 && wind < 15) {
+                score += 5;
+                factors.push({ text: 'Wind is slightly high', positive: false });
+            } else {
+                factors.push({ text: 'Wind is too strong', positive: false });
+            }
+
+            if (recentRain) {
+                score += 15;
+                factors.push({ text: 'Recent rain increases likelihood', positive: true });
+            }
+
+            if (timeOfDay === 'afternoon' || timeOfDay === 'evening') {
+                score += 10;
+                factors.push({ text: 'Time of day is favorable', positive: true });
+            }
+
+            if (cloudCover === 'partly' || cloudCover === 'overcast') {
+                score += 5;
+                factors.push({ text: 'Cloud cover is suitable', positive: true });
+            }
+
+            let probability = Math.min(score, 100);
+            let likelihood = '';
+            let colorClass = '';
+
+            if (probability >= 80) {
+                likelihood = 'Very High';
+                colorClass = 'text-green-600';
+            } else if (probability >= 60) {
+                likelihood = 'High';
+                colorClass = 'text-lime-600';
+            } else if (probability >= 40) {
+                likelihood = 'Moderate';
+                colorClass = 'text-yellow-600';
+            } else if (probability >= 20) {
+                likelihood = 'Low';
+                colorClass = 'text-orange-600';
+            } else {
+                likelihood = 'Very Low';
+                colorClass = 'text-red-600';
+            }
+
+            let resultsHTML = `
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Results</h2>
+                
+                <div class="text-center mb-6">
+                    <div class="text-5xl font-bold ${colorClass} mb-2">
+                        ${probability}%
+                    </div>
+                    <div class="text-lg text-gray-700">
+                        Likelihood: <span class="font-bold ${colorClass}">${likelihood}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 mb-6">
+                    <h3 class="font-semibold text-gray-800 mb-3">Contributing Factors:</h3>
+                    ${factors.map(factor => `
+                        <div class="flex items-start">
+                            <span class="mr-2 ${factor.positive ? 'text-green-600' : 'text-red-600'}">
+                                ${factor.positive ? '✓' : '✗'}
+                            </span>
+                            <span class="text-sm text-gray-700">${factor.text}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            if (biome && speciesByBiome[biome]) {
+                resultsHTML += `
+                    <div class="mt-6 pt-6 border-t border-orange-200">
+                        <h3 class="font-semibold text-gray-800 mb-3">
+                            Species Likely to Fly in ${biomeNames[biome]}:
+                        </h3>
+                        <div class="space-y-4">
+                            ${speciesByBiome[biome].map(species => `
+                                <div class="bg-white p-4 rounded-lg border border-orange-100">
+                                    <div class="flex items-start mb-2">
+                                        <span class="text-amber-600 mr-2 text-lg">🐜</span>
+                                        <div class="flex-1">
+                                            <div class="font-semibold text-gray-800 mb-1">${species.name}</div>
+                                            <div class="text-sm text-gray-600 mb-1">
+                                                <span class="font-medium">Location:</span> ${species.location}
+                                            </div>
+                                            <div class="text-sm text-green-700 bg-green-50 p-2 rounded">
+                                                <span class="font-medium">What to look for:</span> ${species.lookFor}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = resultsHTML;
+            resultsDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
